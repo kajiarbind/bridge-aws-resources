@@ -5,13 +5,15 @@ import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
 interface BridgeSqsProps extends aws_sqs.QueueProps {}
 
 export class BridgeSQS extends aws_sqs.Queue {
+    public sqsApproxAgeOfOldestMessageAlarm: cloudwatch.Alarm;
+
     constructor(scope: Construct, id: string, props: BridgeSqsProps) {
         super(scope, id, {
             ...props
         });
 
         const metric = this.metricApproximateAgeOfOldestMessage();
-        const alarm = new cloudwatch.Alarm(this, `${props.queueName}-ApproximateAgeOfOldestMessageAlarm`, {
+        this.sqsApproxAgeOfOldestMessageAlarm = new cloudwatch.Alarm(this, `${props.queueName}-ApproximateAgeOfOldestMessageAlarm`, {
             alarmName: `${props.queueName}-ApproximateAgeOfOldestMessageAlarm`,
             metric: metric,
             threshold: 600,
